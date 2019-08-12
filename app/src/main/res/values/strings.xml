@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SapiSehat</string>
+    <string name="Copyright">Copyright © 2019 Juma Biring Manggis.</string>
+    <string name="NameBox">Nama Sapi:</string>
+    <string name="AgeBox">Umur Sapi:</string>
+    <string name="WeightBox">Bobot Sapi (kg):</string>
+    <string name="ReadNFC">Baca Tag</string>
+    <string name="WriteNFC">Tulis Tag</string>
+</resources>
