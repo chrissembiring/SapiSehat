@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "98505297675",
+    "firebase_url": "https://sapisehat-a9adf.firebaseio.com",
+    "project_id": "sapisehat-a9adf",
+    "storage_bucket": "sapisehat-a9adf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98505297675:android:5c38ea42d8eb3228",
+        "android_client_info": {
+          "package_name": "com.chrissembiring.sapisehat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "98505297675-03ji9rb3e9nm3b5ce313vgr4vgsjpct2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chrissembiring.sapisehat",
+            "certificate_hash": "9eecc07dfd92f2ee0fb7da91da6aaca71dd9afb5"
+          }
+        },
+        {
+          "client_id": "98505297675-vqkr07ioup6bvnin86moled5l46vs4o7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1pdjDSARdGRMX4ZuDdoRJTgu4NpxAFSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "98505297675-vqkr07ioup6bvnin86moled5l46vs4o7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
