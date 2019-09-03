@@ -13,13 +13,16 @@ import android.nfc.NfcManager;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     // UI initializations
     EditText cowName, cowAge, cowWeight;
-    Button readTag, writeTag;
+    Button formatTag, writeTag;
 
     //NFC initialisations
     NfcAdapter  nfcAdapter;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         cowName = findViewById(R.id.editText2);
         cowAge = findViewById(R.id.editText3);
         cowWeight = findViewById(R.id.editText4);
-        readTag = findViewById(R.id.button);
+        formatTag = findViewById(R.id.button);
         writeTag = findViewById(R.id.button2);
 
         NfcManager manager = (NfcManager) this.getSystemService(Context.NFC_SERVICE);
@@ -55,12 +58,33 @@ public class MainActivity extends AppCompatActivity {
                         new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                 0);
 
-        readTag.setOnClickListener(new View.OnClickListener()
-        {
+        formatTag.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-                Toast.makeText(getApplicationContext(), "Button 1", Toast.LENGTH_LONG).show();
+            public void onClick(View view) {
+                if (tag != null)
+                {
+                    try
+                    {
+                        Ndef ndef = Ndef.get(tag);
+                        ndef.connect();
+                        ndef.writeNdefMessage(new NdefMessage(new NdefRecord(NdefRecord.TNF_EMPTY, null, null, null)));
+                        ndef.close();
+                        cowName.setText("");
+                        cowAge.setText("");
+                        cowWeight.setText("");
+                    }
+
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    catch (FormatException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
             }
         });
 
@@ -68,7 +92,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (cowName.getText().toString().equals("") || cowAge.getText().toString().equals("") || cowWeight.getText().toString().equals(""))
+                if (cowName.getText().toString().equals("") ||
+                    cowAge.getText().toString().equals("") ||
+                    cowWeight.getText().toString().equals("") ||
+                    tag == null)
                 {
 
                     if (TextUtils.isEmpty(cowName.getText().toString()))
@@ -85,16 +112,23 @@ public class MainActivity extends AppCompatActivity {
                     {
                         cowWeight.setError("Bobot tidak boleh kosong.");
                     }
+
+                    if (tag == null)
+                    {
+                        Toast.makeText(getApplicationContext(), "Tag tidak terdeteksi!", Toast.LENGTH_LONG).show();
+                    }
                 }
 
                 else
                 {
+                    /*
                     Cow cow = new Cow();
                     cow.setName(cowName.getText().toString());
                     cow.setAge(Integer.parseInt(cowAge.getText().toString()));
                     cow.setWeight(Integer.parseInt(cowWeight.getText().toString()));
-
-                    Toast.makeText(getApplicationContext(), "Sapi: " + cow.getName() + " sudah tersimpan!", Toast.LENGTH_LONG).show();
+                    */
+                    writeText(view);
+                    Toast.makeText(getApplicationContext(), "Sapi: " + /* cow.getName() */ cowName.getText().toString() + " sudah tersimpan!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -115,10 +149,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent)
-    {
-        tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        Toast.makeText(getBaseContext(), "Tag terdeteksi!", Toast.LENGTH_LONG).show();
+    protected void onNewIntent(Intent intent) {
+        try
+        {
+            setIntent(intent);
+            readIntent(intent);
+            tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            Toast.makeText(getBaseContext(), "Tag terdeteksi!", Toast.LENGTH_LONG).show();
+        }
+
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "Tag kosong terdeteksi!", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void writeText(View v)
@@ -191,4 +235,80 @@ public class MainActivity extends AppCompatActivity {
         NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], data);
         return record;
     }
+
+    private void readIntent(Intent intent)
+    {
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action) ||
+            NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) ||
+            NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action))
+        {
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            NdefMessage[] msgs = null;
+
+            if (rawMsgs != null)
+            {
+                msgs = new NdefMessage[rawMsgs.length];
+
+                for (int i = 0; i < rawMsgs.length; i++)
+                {
+                    msgs[i] = (NdefMessage) rawMsgs[i];
+                }
+            }
+            tagViews(msgs);
+        }
+    }
+
+    private void tagViews(NdefMessage[] msgs) {
+        if (msgs == null || msgs.length == 0)
+            return;
+
+        String[] textMsgs = new String[3];
+        int i = 0;
+
+        do
+        {
+             byte[] payload = msgs[0].getRecords()[i].getPayload();
+             String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+             int languageCodeLength = payload[0] & 0063;
+
+             try
+             {
+                 textMsgs[i] = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+             }
+
+             catch (UnsupportedEncodingException e)
+             {
+                 Log.e("Unsupported Encoding", e.toString());
+             }
+
+             i++;
+        }
+        while (i < msgs[0].getRecords().length);
+
+        cowName.setText(textMsgs[0]);
+        cowAge.setText(textMsgs[1]);
+        cowWeight.setText(textMsgs[2]);
+    }
+
+
+        /*
+
+        String text = "";
+        byte[] payload = msgs[0].getRecords()[0].getPayload();
+        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+        int languageCodeLength = payload[0] & 0063;
+
+        try {
+            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+        } catch (UnsupportedEncodingException e) {
+            Log.e("Unsupported Encoding", e.toString());
+        }
+
+        cowName.setText(text);
+    }
+
+         */
+
+
 }

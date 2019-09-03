@@ -90,23 +90,30 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="126dp"
-        android:layout_height="46dp"
+        android:layout_width="284dp"
+        android:layout_height="48dp"
         android:layout_marginStart="64dp"
-        android:text="@string/ReadNFC"
-        app:layout_constraintBottom_toBottomOf="@+id/button2"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="64dp"
+        android:backgroundTint="#F44336"
+        android:text="@string/FormatNFC"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/button2"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="126dp"
-        android:layout_height="46dp"
+        android:layout_width="284dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="64dp"
         android:layout_marginTop="52dp"
         android:layout_marginEnd="64dp"
+        android:backgroundTint="#4CAF50"
         android:text="@string/WriteNFC"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText4" />
 
 

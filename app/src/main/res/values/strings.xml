@@ -4,6 +4,6 @@
     <string name="NameBox">Nama Sapi:</string>
     <string name="AgeBox">Umur Sapi:</string>
     <string name="WeightBox">Bobot Sapi (kg):</string>
-    <string name="ReadNFC">Baca Tag</string>
+    <string name="FormatNFC">Hapus Tag</string>
     <string name="WriteNFC">Tulis Tag</string>
 </resources>
